@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PariwisataController;
+
+Route::get("/", [HomeController::class, "index"]);
 
 Route::prefix('pariwisata')->name('pariwisata.')->group(function () {
     Route::get('/', [PariwisataController::class, 'index'])->name('index');

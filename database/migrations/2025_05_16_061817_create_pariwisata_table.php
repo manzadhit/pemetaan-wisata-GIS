@@ -12,14 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pariwisata', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->string('nama');
-            $table->string('jenis');
+            $table->unsignedBigInteger('jenis_id');
+            $table->unsignedBigInteger('kecamatan_id');
             $table->string('alamat');
-            $table->string('kecamatan');
-            $table->string('foto')->nullable();
-            $table->text('deskripsi')->nullable();
+            $table->text('deskripsi');
+            $table->decimal('latitude', 10, 6);
+            $table->decimal('longitude', 10, 6);
+            $table->float('rating')->nullable();
+            $table->string('gambar')->nullable();
             $table->timestamps();
+
+            $table->foreign('jenis_id')->references('id')->on('jenis_wisata');
+            $table->foreign('kecamatan_id')->references('id')->on('kecamatan');
         });
     }
 
