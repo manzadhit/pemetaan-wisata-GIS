@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MapsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PariwisataController;
 
 Route::get("/", [HomeController::class, "index"])->name("beranda");
+
+Route::get("/pemetaan", [MapsController::class, "index"])->name("pemetaan.index");
 
 Route::prefix('pariwisata')->name('pariwisata.')->group(function () {
     Route::get('/', [PariwisataController::class, 'index'])->name('index');
