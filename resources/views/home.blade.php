@@ -9,7 +9,7 @@
 
         <div class="mt-4">
             <a href="#" class="btn btn-success me-2">Lihat Peta Wisata</a>
-            <a href="#" class="btn btn-primary">Daftar Wisata</a>
+            <a href="{{ route("pariwisata.index") }}" class="btn btn-primary">Daftar Wisata</a>
         </div>
     </div>
 

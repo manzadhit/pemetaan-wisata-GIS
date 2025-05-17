@@ -10,13 +10,13 @@ class PariwisataController extends Controller
 {
     public function index()
     {
-        $data = Pariwisata::latest()->get();
-        return view('pariwisata.index', compact('data'));
+        $daftar_wisata = Pariwisata::latest()->get();
+        return view('wisata.index', compact('daftar_wisata'));
     }
 
     // public function create()
     // {
-    //     return view('pariwisata.create');
+    //     return view('wisata.create');
     // }
 
     // public function store(Request $request)
@@ -42,13 +42,13 @@ class PariwisataController extends Controller
     // public function show($id)
     // {
     //     $data = Pariwisata::findOrFail($id);
-    //     return view('pariwisata.show', compact('data'));
+    //     return view('wisata.show', compact('data'));
     // }
 
     // public function edit($id)
     // {
     //     $data = Pariwisata::findOrFail($id);
-    //     return view('pariwisata.edit', compact('data'));
+    //     return view('wisata.edit', compact('data'));
     // }
 
     // public function update(Request $request, $id)

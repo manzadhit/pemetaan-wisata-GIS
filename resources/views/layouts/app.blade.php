@@ -22,9 +22,9 @@
             <a class="navbar-brand" href="{{ url('/') }}">WisataKita</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a href="#" class="nav-link">Beranda</a></li>
+                    <li class="nav-item"><a href="{{ route("beranda") }}" class="nav-link">Beranda</a></li>
                     <li class="nav-item"><a href="#" class="nav-link">Pemetaan</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Daftar Wisata</a></li>
+                    <li class="nav-item"><a href="{{ route("pariwisata.index") }}" class="nav-link">Daftar Wisata</a></li>
                 </ul>
             </div>
         </div>
