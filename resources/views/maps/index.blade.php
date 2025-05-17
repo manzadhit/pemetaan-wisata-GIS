@@ -8,36 +8,43 @@
             height: 600px;
             width: 100%;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .leaflet-popup-content {
             margin: 0;
             padding: 0;
         }
+
         .popup-card {
             width: 250px;
         }
+
         .popup-card img {
             width: 100%;
             height: 150px;
             object-fit: cover;
             border-radius: 5px 5px 0 0;
         }
+
         .popup-content {
             padding: 10px;
         }
+
         .filter-section {
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
+
         .legend {
             background: white;
             padding: 8px;
             border-radius: 5px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
         }
+
         .legend i {
             width: 18px;
             height: 18px;
@@ -49,98 +56,105 @@
 @endpush
 
 @section('content')
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="mb-2">Peta Wisata Kota Kendari</h1>
-            <p class="text-muted">Jelajahi berbagai destinasi wisata menarik di Kota Kendari, Sulawesi Tenggara</p>
-        </div>
-    </div>
-
-    <!-- Filter -->
-    <div class="filter-section">
-        <form method="GET" class="row g-3">
-            <div class="col-md-5">
-                <label for="jenis_id" class="form-label">Jenis Wisata</label>
-                <select name="jenis_id" id="jenis_id" class="form-select">
-                    <option value="">-- Semua Jenis Wisata --</option>
-                    @foreach ($jenis_wisata as $jenis)
-                        <option value="{{ $jenis->id }}" {{ request('jenis_id') == $jenis->id ? 'selected' : '' }}>
-                            {{ $jenis->nama }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-5">
-                <label for="kecamatan_id" class="form-label">Kecamatan</label>
-                <select name="kecamatan_id" id="kecamatan_id" class="form-select">
-                    <option value="">-- Semua Kecamatan --</option>
-                    @foreach ($daftar_kecamatan as $kec)
-                        <option value="{{ $kec->id }}" {{ request('kecamatan_id') == $kec->id ? 'selected' : '' }}>
-                            {{ $kec->nama }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Terapkan</button>
-            </div>
-            @if(request('jenis_id') || request('kecamatan_id'))
+    <div class="container">
+        <div class="container d-flex justify-content-center" style="padding-top: 100px;">
+            <div class="row text-center">
                 <div class="col-12">
-                    <a href="{{ route('pemetaan.index') }}" class="btn btn-sm btn-outline-secondary">Reset Filter</a>
+                    <h1 class="mb-2  text-primary">Peta Wisata Kota Kendari</h1>
+                    <p class="text-muted">Jelajahi berbagai destinasi wisata menarik di Kota Kendari, Sulawesi Tenggara</p>
                 </div>
-            @endif
-        </form>
-    </div>
-
-    <!-- Map -->
-    <div class="card mb-4">
-        <div class="card-body p-0">
-            <div id="map"></div>
+            </div>
         </div>
-    </div>
 
-    <!-- Wisata List Preview -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <h3>Tempat Wisata Terpopuler</h3>
-            <div class="row">
-                @forelse($daftar_wisata->take(3) as $wisata)
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            @if($wisata->gambar)
-                                <img src="{{ asset('storage/' . $wisata->gambar) }}" class="card-img-top" alt="{{ $wisata->nama }}" style="height: 180px; object-fit: cover;">
-                            @else
-                                <div class="bg-light text-center py-5">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
-                                </div>
-                            @endif
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $wisata->nama }}</h5>
-                                <p class="card-text mb-1"><small class="text-muted">{{ $wisata->jenis->nama }} • {{ $wisata->kecamatan->nama }}</small></p>
-                                @if($wisata->rating)
-                                    <div class="mb-2">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            @if($i <= round($wisata->rating))
-                                                <i class="fas fa-star text-warning"></i>
-                                            @else
-                                                <i class="far fa-star text-warning"></i>
-                                            @endif
-                                        @endfor
-                                        <span class="ms-1">{{ $wisata->rating }}/5</span>
+
+        <!-- Filter -->
+        <div class="filter-section">
+            <form method="GET" class="row g-3">
+                <div class="col-md-5">
+                    <label for="jenis_id" class="form-label">Jenis Wisata</label>
+                    <select name="jenis_id" id="jenis_id" class="form-select">
+                        <option value="">-- Semua Jenis Wisata --</option>
+                        @foreach ($jenis_wisata as $jenis)
+                            <option value="{{ $jenis->id }}" {{ request('jenis_id') == $jenis->id ? 'selected' : '' }}>
+                                {{ $jenis->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label for="kecamatan_id" class="form-label">Kecamatan</label>
+                    <select name="kecamatan_id" id="kecamatan_id" class="form-select">
+                        <option value="">-- Semua Kecamatan --</option>
+                        @foreach ($daftar_kecamatan as $kec)
+                            <option value="{{ $kec->id }}" {{ request('kecamatan_id') == $kec->id ? 'selected' : '' }}>
+                                {{ $kec->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Terapkan</button>
+                </div>
+                @if (request('jenis_id') || request('kecamatan_id'))
+                    <div class="col-12">
+                        <a href="{{ route('pemetaan.index') }}" class="btn btn-sm btn-outline-secondary">Reset Filter</a>
+                    </div>
+                @endif
+            </form>
+        </div>
+
+        <!-- Map -->
+        <div class="card mb-4">
+            <div class="card-body p-0">
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <!-- Wisata List Preview -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Tempat Wisata Terpopuler</h3>
+                <div class="row">
+                    @forelse($daftar_wisata->take(3) as $wisata)
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                @if ($wisata->gambar)
+                                    <img src="{{ asset('storage/' . $wisata->gambar) }}" class="card-img-top"
+                                        alt="{{ $wisata->nama }}" style="height: 180px; object-fit: cover;">
+                                @else
+                                    <div class="bg-light text-center py-5">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
                                     </div>
                                 @endif
-                                <p class="card-text">{{ Str::limit($wisata->deskripsi, 100) }}</p>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Lihat Detail</a>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $wisata->nama }}</h5>
+                                    <p class="card-text mb-1"><small class="text-muted">{{ $wisata->jenis->nama }} •
+                                            {{ $wisata->kecamatan->nama }}</small></p>
+                                    @if ($wisata->rating)
+                                        <div class="mb-2">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if ($i <= round($wisata->rating))
+                                                    <i class="fas fa-star text-warning"></i>
+                                                @else
+                                                    <i class="far fa-star text-warning"></i>
+                                                @endif
+                                            @endfor
+                                            <span class="ms-1">{{ $wisata->rating }}/5</span>
+                                        </div>
+                                    @endif
+                                    <p class="card-text">{{ Str::limit($wisata->deskripsi, 100) }}</p>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Lihat Detail</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @empty
-                    <div class="col-12">
-                        <div class="alert alert-info">
-                            Tidak ada tempat wisata yang ditemukan.
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                Tidak ada tempat wisata yang ditemukan.
+                            </div>
                         </div>
-                    </div>
-                @endforelse
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
@@ -184,7 +198,9 @@
             };
 
             // Legenda
-            const legend = L.control({position: 'bottomright'});
+            const legend = L.control({
+                position: 'bottomright'
+            });
             legend.onAdd = function(map) {
                 const div = L.DomUtil.create('div', 'legend');
                 div.innerHTML = '<h6>Jenis Wisata</h6>';
@@ -207,7 +223,9 @@
                     const markerColor = jenisColors[w.jenis.id];
                     const icon = createMarkerIcon(markerColor);
 
-                    const marker = L.marker([w.latitude, w.longitude], {icon: icon}).addTo(map);
+                    const marker = L.marker([w.latitude, w.longitude], {
+                        icon: icon
+                    }).addTo(map);
 
                     // Tambahkan jenis wisata ke legenda
                     if (!legendItems.has(w.jenis.id)) {
@@ -258,7 +276,10 @@
             }
 
             // Tambahkan kontrol skala
-            L.control.scale({imperial: false, metric: true}).addTo(map);
+            L.control.scale({
+                imperial: false,
+                metric: true
+            }).addTo(map);
 
             // Tambahkan tombol lokasi saya
             L.control.locate({
