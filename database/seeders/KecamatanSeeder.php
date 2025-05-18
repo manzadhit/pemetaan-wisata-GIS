@@ -16,7 +16,13 @@ class KecamatanSeeder extends Seeder
         $kecamatan = [
             'Nambo',
             'Abeli',
-            'Kendari Barat'
+            'Kendari Barat',
+            'Mandonga',
+            'Kadia',
+            'Kambu',
+            'Baruga',
+            'Poasia',
+            'Puuwatu',
         ];
 
         foreach ($kecamatan as $nama) {

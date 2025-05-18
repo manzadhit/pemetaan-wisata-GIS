@@ -117,7 +117,7 @@
             <div class="col-12">
                 <h3>Tempat Wisata Terpopuler</h3>
                 <div class="row">
-                    @forelse($daftar_wisata->take(3) as $wisata)
+                    @forelse($daftar_wisata as $wisata)
                         <div class="col-md-4 mb-4">
                             <div class="card h-100">
                                 @if ($wisata->gambar)
@@ -594,7 +594,7 @@
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
         }
-        
+
         .legend i {
             width: 18px;
             height: 18px;
@@ -602,7 +602,7 @@
             margin-right: 8px;
             opacity: 0.7;
         }
-        
+
         .kecamatan-legend {
             max-height: 200px;
             overflow-y: auto;
