@@ -14,6 +14,14 @@ class PariwisataController extends Controller
         return view('wisata.index', compact('daftar_wisata'));
     }
 
+    public function show($id)
+    {
+        // Ambil 1 data wisata berdasarkan id dengan relasi kecamatan dan jenis
+        $wisata = Pariwisata::with(['kecamatan', 'jenis'])->findOrFail($id);
+
+        // Kirim ke view detail
+        return view('wisata.show', compact('wisata'));
+    }
     // public function create()
     // {
     //     return view('wisata.create');

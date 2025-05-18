@@ -27,8 +27,8 @@
 
                 <div class="col-lg-6">
                     <div class="hero-image">
-                        <img src="{{ asset('assets/img/illustration/illustration-16.webp') }}" alt="Business Growth"
-                            class="img-fluid" loading="lazy">
+                        <img src="{{ asset('assets/img/hero_kmi.png') }}" alt="Business Growth" class="img-fluid"
+                            loading="lazy">
                     </div>
                 </div>
             </div>

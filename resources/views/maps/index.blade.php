@@ -157,6 +157,7 @@
                         </div>
                     @endforelse
                 </div>
+
             </div>
         </div>
     </div>
@@ -165,7 +166,6 @@
 @push('scripts')
     <!-- Font Awesome untuk ikon rating -->
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Inisialisasi peta dengan koordinat Kota Kendari
@@ -200,37 +200,37 @@
                 'nambo': '#D35400' // Jingga tua
             };
 
-
-
             // Icon default dan warna-warna marker
             const createMarkerIcon = (color) => {
                 return L.divIcon({
                     className: 'custom-marker',
                     html: `<svg width="24" height="36" viewBox="0 0 24 36">
-                      <path fill="${color}" d="M12 0C5.4 0 0 5.4 0 12c0 7.2 12 24 12 24s12-16.8 12-24c0-6.6-5.4-12-12-12z"/>
-                      <circle fill="white" cx="12" cy="12" r="5"/>
-                  </svg>`,
+                <path fill="${color}" d="M12 0C5.4 0 0 5.4 0 12c0 7.2 12 24 12 24s12-16.8 12-24c0-6.6-5.4-12-12-12z"/>
+                <circle fill="white" cx="12" cy="12" r="5"/>
+            </svg>`,
                     iconSize: [24, 36],
                     iconAnchor: [12, 36],
                     popupAnchor: [0, -36]
                 });
             };
 
-            // Legenda untuk jenis wisata
-            const legend = L.control({
+            // Legenda untuk jenis wisata - PERBAIKAN: Membuat kontrol terpisah
+            const jenisWisataLegend = L.control({
                 position: 'bottomright'
             });
-            legend.onAdd = function(map) {
-                const div = L.DomUtil.create('div', 'legend');
+
+            jenisWisataLegend.onAdd = function(map) {
+                const div = L.DomUtil.create('div', 'legend jenis-wisata-legend');
                 div.innerHTML = '<h6>Jenis Wisata</h6>';
                 return div;
             };
-            legend.addTo(map);
+            jenisWisataLegend.addTo(map);
 
-            // Legenda untuk kecamatan
+            // Legenda untuk kecamatan - Tetap di posisi bottomleft
             const kecamatanLegend = L.control({
                 position: 'bottomleft'
             });
+
             kecamatanLegend.onAdd = function(map) {
                 const div = L.DomUtil.create('div', 'legend kecamatan-legend');
                 div.innerHTML = '<h6>Kecamatan</h6>';
@@ -280,12 +280,12 @@
                         // Tambahkan ke layer group
                         kecamatanLayerGroup.addLayer(kecamatanLayer);
 
-                        // Tambahkan ke legenda
+                        // Tambahkan ke legenda kecamatan
                         if (!kecamatanItems.has(kecamatanName)) {
                             const legendDiv = document.querySelector('.kecamatan-legend');
                             legendDiv.innerHTML += `
                         <div class="mb-1">
-                            <i style="background:${color}"></i>
+                            <i class="kecamatan-color" style="background:${color}"></i>
                             <span>${kecamatanDisplayName}</span>
                         </div>
                     `;
@@ -313,11 +313,58 @@
             addKecamatanGeoJSON('puuwatu', 'Puuwatu', '/geojson/kecamatan_puuwatu.geojson');
             addKecamatanGeoJSON('wua_wua', 'Wua-wua', '/geojson/kecamatan_wua_wua.geojson');
 
-            // Tambahkan kecamatan lain jika ada
-            // addKecamatanGeoJSON('nama_kecamatan', 'Nama Display', '/path/to/geojson.geojson');
-
             // Tambahkan layer group ke peta
             kecamatanLayerGroup.addTo(map);
+
+            // Fungsi untuk menghitung Convex Hull dengan algoritma Graham Scan
+            function getConvexHull(points) {
+                if (points.length < 3) return points;
+
+                // Fungsi untuk menentukan arah 3 titik (CCW > 0, CW < 0, Collinear = 0)
+                function orientation(p, q, r) {
+                    const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
+                    if (val === 0) return 0; // collinear
+                    return (val > 0) ? 1 : 2; // clock or counterclock wise
+                }
+
+                // Temukan titik dengan y terendah (atau paling kiri jika ada beberapa)
+                let minY = points[0][0];
+                let minIndex = 0;
+                for (let i = 1; i < points.length; i++) {
+                    const y = points[i][0];
+                    if ((y < minY) || (y === minY && points[i][1] < points[minIndex][1])) {
+                        minY = y;
+                        minIndex = i;
+                    }
+                }
+
+                // Tukar titik terendah dengan titik pertama
+                [points[0], points[minIndex]] = [points[minIndex], points[0]];
+
+                // Urutkan titik berdasarkan sudut polar relatif terhadap titik terendah
+                const p0 = points[0];
+                points.sort((a, b) => {
+                    const o = orientation(p0, a, b);
+                    if (o === 0) {
+                        // Jika collinear, ambil yang terdekat dulu
+                        return (Math.pow(a[0] - p0[0], 2) + Math.pow(a[1] - p0[1], 2)) -
+                            (Math.pow(b[0] - p0[0], 2) + Math.pow(b[1] - p0[1], 2));
+                    }
+                    return (o === 2) ? -1 : 1;
+                });
+
+                // Bangun hull
+                const hull = [points[0], points[1]];
+                for (let i = 2; i < points.length; i++) {
+                    while (hull.length > 1 && orientation(hull[hull.length - 2], hull[hull.length - 1], points[
+                            i]) !== 2) {
+                        hull.pop();
+                    }
+                    hull.push(points[i]);
+                }
+
+                return hull;
+            }
 
             // Untuk kecamatan yang tidak memiliki GeoJSON, buat polygon dari titik-titik wisata
             function createRemainingKecamatanPolygons() {
@@ -330,8 +377,6 @@
                     const nama = uniqueKecamatan[id].nama.toLowerCase();
                     kecamatanNameToId[nama] = id;
                 });
-
-
 
                 // Grup wisata berdasarkan kecamatan
                 const kecamatanGroups = {};
@@ -426,12 +471,12 @@
 
                         polygon.bindPopup(`<strong>Kecamatan ${kecamatan.nama}</strong>`);
 
-                        // Tambahkan ke legenda
+                        // Tambahkan ke legenda kecamatan
                         if (!kecamatanItems.has(kecId)) {
                             const legendDiv = document.querySelector('.kecamatan-legend');
                             legendDiv.innerHTML += `
                         <div class="mb-1">
-                            <i style="background:${color}"></i>
+                            <i class="kecamatan-color" style="background:${color}"></i>
                             <span>${kecamatan.nama}</span>
                         </div>
                     `;
@@ -442,56 +487,6 @@
                         polygon.bringToBack();
                     }
                 });
-            }
-
-            // Fungsi untuk menghitung Convex Hull dengan algoritma Graham Scan
-            function getConvexHull(points) {
-                if (points.length < 3) return points;
-
-                // Fungsi untuk menentukan arah 3 titik (CCW > 0, CW < 0, Collinear = 0)
-                function orientation(p, q, r) {
-                    const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
-                    if (val === 0) return 0; // collinear
-                    return (val > 0) ? 1 : 2; // clock or counterclock wise
-                }
-
-                // Temukan titik dengan y terendah (atau paling kiri jika ada beberapa)
-                let minY = points[0][0];
-                let minIndex = 0;
-                for (let i = 1; i < points.length; i++) {
-                    const y = points[i][0];
-                    if ((y < minY) || (y === minY && points[i][1] < points[minIndex][1])) {
-                        minY = y;
-                        minIndex = i;
-                    }
-                }
-
-                // Tukar titik terendah dengan titik pertama
-                [points[0], points[minIndex]] = [points[minIndex], points[0]];
-
-                // Urutkan titik berdasarkan sudut polar relatif terhadap titik terendah
-                const p0 = points[0];
-                points.sort((a, b) => {
-                    const o = orientation(p0, a, b);
-                    if (o === 0) {
-                        // Jika collinear, ambil yang terdekat dulu
-                        return (Math.pow(a[0] - p0[0], 2) + Math.pow(a[1] - p0[1], 2)) -
-                            (Math.pow(b[0] - p0[0], 2) + Math.pow(b[1] - p0[1], 2));
-                    }
-                    return (o === 2) ? -1 : 1;
-                });
-
-                // Bangun hull
-                const hull = [points[0], points[1]];
-                for (let i = 2; i < points.length; i++) {
-                    while (hull.length > 1 && orientation(hull[hull.length - 2], hull[hull.length - 1], points[
-                            i]) !== 2) {
-                        hull.pop();
-                    }
-                    hull.push(points[i]);
-                }
-
-                return hull;
             }
 
             // Jalankan setelah semua GeoJSON dimuat (tunggu sedikit)
@@ -513,12 +508,18 @@
                         icon: icon
                     }).addTo(map);
 
-                    // Tambahkan jenis wisata ke legenda
+                    // Tambahkan jenis wisata ke legenda jenis wisata
                     if (!legendItems.has(w.jenis.id)) {
-                        const legendDiv = document.querySelector('.legend');
+                        const legendDiv = document.querySelector('.jenis-wisata-legend');
+                        // PERBAIKAN: Gunakan SVG marker yang sama seperti di peta untuk legenda
                         legendDiv.innerHTML += `
                     <div class="mb-1">
-                        <i style="background:${markerColor}"></i>
+                        <span class="legend-marker">
+                            <svg width="20" height="30" viewBox="0 0 24 36">
+                                <path fill="${markerColor}" d="M12 0C5.4 0 0 5.4 0 12c0 7.2 12 24 12 24s12-16.8 12-24c0-6.6-5.4-12-12-12z"/>
+                                <circle fill="white" cx="12" cy="12" r="5"/>
+                            </svg>
+                        </span>
                         <span>${w.jenis.nama}</span>
                     </div>
                 `;
@@ -593,20 +594,51 @@
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        }
-
-        .legend i {
-            width: 18px;
-            height: 18px;
-            float: left;
-            margin-right: 8px;
-            opacity: 0.7;
+            margin-bottom: 10px;
         }
 
         .kecamatan-legend {
             max-height: 200px;
             overflow-y: auto;
         }
+
+        .kecamatan-color {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+            border-radius: 3px;
+        }
+
+        .legend-marker {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .legend-marker svg {
+            vertical-align: middle;
+        }
+
+        .jenis-wisata-legend div, .kecamatan-legend div {
+            clear: both;
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .jenis-wisata-legend h6, .kecamatan-legend h6 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            font-weight: bold;
+        }
+    .kecamatan-legend, .jenis-wisata-legend {
+    position: absolute;  /* atau biarkan default */
+    z-index: 500; /* Lebih rendah dari navbar */
+}
     `;
             document.head.appendChild(style);
         });

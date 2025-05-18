@@ -63,9 +63,11 @@
                                         </div>
                                     </td>
                                     <td class="align-middle">
-                                        <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <a href="{{ route('pariwisata.show', $wisata->id) }}"
+                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-info-circle me-1"></i>Detail
                                         </a>
+
                                     </td>
                                 </tr>
                             @empty
