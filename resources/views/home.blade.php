@@ -28,7 +28,7 @@
                 <div class="col-lg-6">
                     <div class="hero-image">
                         <img src="{{ asset('assets/img/hero_kmi.png') }}" alt="Business Growth" class="img-fluid"
-                            loading="lazy">
+                            loading="lazy" style="max-height: 500px; object-fit: contain; width: 100%;">
                     </div>
                 </div>
             </div>

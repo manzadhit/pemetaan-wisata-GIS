@@ -8,6 +8,18 @@ class Pariwisata extends Model
 {
     protected $table = "pariwisata";
 
+    protected $fillable = [
+        'nama',
+        'jenis_id',
+        'kecamatan_id',
+        'alamat',
+        'deskripsi',
+        'latitude',
+        'longitude',
+        'rating',
+        'gambar'
+    ];
+
     public function jenis() {
         return $this->belongsTo(JenisWisata::class, "jenis_id");
     }
